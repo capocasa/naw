@@ -42,21 +42,51 @@ yields
     -------------------- --------------------
 
 
-`rows()` iterates through all rows of stdin.
-
-`rows("path/to/my/file")` iterates through the rows of arbitrary files. They can be combined.
-
-These are canonical and most convenient use cases, but arbitary code may be used to aquire or generate data.
-
 Features
 --------
 
 Complete Nim syntax is supported through the `stdtmpl` source code filter. Complete nim strformat syntax is supported for output.
 
+Additional convenience syntax is added:
+
+------------------------- --------------------------------------------------------------------------
+`rows()`                  Iterator to iterate through a CSV stdin, using the seperator
+`rows("filename")`        specified with -F
+
+`+`                       Unary plus-sign, synonymous for parseInt
+`~`                       Unary tilde, synonymous for parseFloat
+------------------------- --------------------------------------------------------------------------
+
 Requirements
 ------------
 
 naw requires the Nim compiler to work.
+
+
+Internals
+---------
+
+naw bolts strformat onto the stdtmpl language and adds some glue, resulting in a really concise
+templating language for text formatting form CSV data, which is exactly what awk's domain is.
+
+If you don't mind creating a file to compile, you can get very similar results to naw with pure nim
+
+    #? stdtmpl(emit="stdout.write &")
+    # import strformat, streams, parsecsv
+    # var x: CsvParser
+    # open(x, newFileStream(stdin), "-", '\t')
+
+    My Report
+    =========
+
+    {"":-<20} {"":-<20}
+    # while x.readRow():
+    {x.row[0]:<20} {x.row[1]:>20}
+    # end
+    {"":-<20} {"":-<20}
+
+naw just allows you to pass the code as a command line parameter, which is nice if you're familiar with awk,
+and auto-imports strformat, streams and parsecsv as well as adding some shorthand syntax of its own.
 
 Limitations
 -----------

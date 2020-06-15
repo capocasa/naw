@@ -65,7 +65,10 @@ Options:
     stderr.writeLine "Temporary nim program %s left in place due to compile error, please remove manually" % tmpn
   quit r
 
-let separator = chr(parseInt(paramStr(1)))
+let separator = try:
+  chr(parseInt(paramStr(1)))
+except IndexError:
+  '\t'
 
 template rows*(s: string): untyped =
   rows(openFileStream(s), s)
@@ -75,3 +78,10 @@ iterator rows*(f: Stream = newFileStream(stdin), n: string = "-", s:char = separ
   open(x, f, n, s)
   while x.readRow():
     yield x.row
+
+template `+`*(s: string):int =
+  parseInt(s)
+
+template `~`*(s: string):float =
+  parseFloat(s)
+
